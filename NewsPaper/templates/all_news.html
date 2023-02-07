@@ -1,0 +1,33 @@
+{% extends 'default.html' %}
+
+{% load custom_filters %}
+
+{% block title %}
+NEWS
+{% endblock title %}
+
+{% block content %}
+    <h1>Все новости:</h1>
+    <h8>Количество новостей: {{ posts|length }}</h8>
+    <hr>
+    {% if posts %}
+        <table>
+            <tr>
+                <td>Заголовок: </td>
+                <td>Дата публикации: </td>
+                <td>Содержание: </td>
+            </tr>
+
+            {% for post in posts|dictsortreversed:"dateCreation" %}
+            <tr>
+                <td>{{ post.title|censor:"редиска" }}</td>
+                <td>{{ post.dateCreation|date:'d M Y' }}</td>
+                <td>{{ post.text|truncatewords:20|censor:"редиска"  }}</td>
+            </tr>
+            {% endfor %}
+
+        </table>
+    {% else %}
+         <h3> Новости готовятся к публикации</h3>
+    {% endif %}
+{% endblock content %}

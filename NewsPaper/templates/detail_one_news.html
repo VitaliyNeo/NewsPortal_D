@@ -1,0 +1,23 @@
+{% extends 'flatpages/default.html' %}
+
+{% load custom_filters %}
+
+{% block title %}
+NEWS
+{% endblock title %}
+
+{% block content %}
+<h1>Новость:</h1>
+<hr>
+<table>
+        <tr>
+            <td>{{ detail_one_news.title|censor:"редиска" }}</td>
+        </tr>
+        <tr>
+            <td align="right">{{ detail_one_news.dateCreation|date:'d M Y' }}</td>
+        </tr>
+        <tr>
+            <td>{{ detail_one_news.text|censor:"редиска" }}</td>
+        </tr>
+</table>
+{% endblock content %}
