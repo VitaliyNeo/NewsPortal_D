@@ -4,6 +4,7 @@ from .views import (NewsList, NewsDetail, NewsListSearch, PostCreate, PostUpdate
                     PostDelete, PostCreateAR, PostUpdateAR, PostDeleteAR)
 
 
+
 urlpatterns = [
    # path — означает путь.
    # В данном случае путь ко всем статьям у нас останется пустым,

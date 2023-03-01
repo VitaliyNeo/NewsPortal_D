@@ -40,14 +40,16 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.flatpages',
     'django_filters',
+    'django_apscheduler',
 
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.yandex',
 
-    'news',
-]
+    'news.apps.NewsConfig',
+
+    ]
 
 SITE_ID = 1
 
@@ -150,5 +152,30 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
-ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_FORMS = {"signup": "accounts.forms.CustomSignupForm"}
+
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_PORT = 465
+EMAIL_HOST_USER = "poch7a.7@yandex.ru"
+EMAIL_HOST_PASSWORD = "****************"
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
+EMAIL_SUBJECT_PREFIX = "Сообщение с сайта"
+
+DEFAULT_FROM_EMAIL = "poch7a.7@yandex.ru"
+
+SERVER_EMAIL = "poch7a.7@yandex.ru"
+AUTHORS = (
+    ('Ivan', '9999vetas9999@yandex.ru'),
+    ('Petr', '7777vetas7777@gmail.com'),
+    ('Semen', '8888vetas8888@yandex.ru'),
+)
+ADMINS = (
+    ('admin', 'poch7a.7@yandex.ru'),
+)
+
+APSCHEDULER_DATETIME_FORMAT = 'N j, Y, f:s a'
+APSCHEDULER_RUN_NOW_TIMEOUT = 25
