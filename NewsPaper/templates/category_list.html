@@ -1,0 +1,86 @@
+{% extends 'default.html' %}
+
+{% load custom_filters %}
+
+{% block title %}
+NEWS
+{% endblock title %}
+
+{% block content %}
+    <h1>Все новости и статьи:</h1>
+    <h8>Количество новостей и статей: {{ posts|length }}</h8>
+    <hr>
+<!--       {# Теперь будем проверять не request.user.is_authenticated, а конкретные права #}-->
+    {% if perms.news.add_post %}
+    <a href="{% url 'articles_create' %}">Добавить статью</a> <a href="{% url 'news_create' %}">Добавить новость</a>
+    {% endif %}
+
+    {% if is_not_subscriber %}
+<p class="text-center"><a href="{% url 'subscribe' category.id %}" class="btn btn-secondary btn-sm">Подписаться</a></p>
+    {% endif %}
+
+    {% if posts %}
+        <table>
+            <tr>
+                <td>Заголовок: </td>
+                <td>Дата публикации: </td>
+                <td>Содержание: </td>
+                <td>Категория поста: </td>
+                {% if perms.news.change_post or perms.news.delete_post %}
+                <td>Действия:</td>
+                {% endif %}
+            </tr>
+
+            {% for post in category_news_list|dictsortreversed:"dateCreation" %}
+            <tr>
+                <td>{{ post.title|censor:"редиска" }}</td>
+                <td>{{ post.dateCreation|date:'d M Y' }}</td>
+                <td>{{ post.text|truncatewords:20|censor:"редиска"  }}</td>
+                <td>{{ post.categoryType }}</td>
+                <td>
+                    {# Размещаем ссылки #}
+                    {% if post.categoryType == "AR" and perms.news.change_post %}
+                     <a href="{% url 'articles_create' pk=post.id %}">Изменить</a>
+                    {% elif post.categoryType == "NW" and perms.news.change_post %}
+                     <a href="{% url 'news_create' pk=post.id %}">Изменить</a>
+                    {% endif %}
+                    {% if post.categoryType == "AR" and perms.news.delete_post %}
+                     <a href="{% url 'articles_delete' post.id %}">Удалить</a>
+                    {% elif post.categoryType == "NW" and perms.news.delete_post %}
+                     <a href="{% url 'news_delete' post.id %}">Удалить</a>
+                    {% endif %}
+                </td>
+                {% for category in post.category.all %}
+                    <a href="{% url 'category_list' category.id %}"{{ category }}
+                       {% endfor %}
+            </tr>
+            {% endfor %}
+
+        </table>
+    {% else %}
+         <h3> Новости готовятся к публикации</h3>
+    {% endif %}
+<!--{# Добавляем пагинацию на страницу #}-->
+
+<!--   {# Информация о предыдущих страницах #}-->
+   {% if page_obj.has_previous %}
+       <a href="?page=1">1</a>
+       {% if page_obj.previous_page_number != 1 %}
+           ...
+           <a href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+       {% endif %}
+   {% endif %}
+
+<!--   {# Информация о текущей странице #}-->
+   {{ page_obj.number }}
+
+<!--   {# Информация о следующих страницах #}-->
+   {% if page_obj.has_next %}
+       <a href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+       {% if paginator.num_pages != page_obj.next_page_number %}
+           ...
+           <a href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a>
+       {% endif %}
+   {% endif %}
+
+{% endblock content %}
