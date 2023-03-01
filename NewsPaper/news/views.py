@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import Post
@@ -57,7 +58,8 @@ class NewsListSearch(NewsList):
 
 
 # Добавляем новое представление для создания новости.
-class PostCreate(CreateView):
+class PostCreate(PermissionRequiredMixin, CreateView):
+    permission_required = ('news.add_post',)
     # Указываем нашу разработанную форму
     form_class = PostForm
     # модель постов
@@ -72,22 +74,24 @@ class PostCreate(CreateView):
 
 
 # # Добавляем представление для изменения статьи.
-class PostUpdate(UpdateView):
+class PostUpdate(PermissionRequiredMixin, UpdateView):
+    permission_required = ('news.change_post',)
     form_class = PostForm
     model = Post
     template_name = 'news_edit.html'
 
 
 # # Представление удаляющее статью.
-class PostDelete(DeleteView):
+class PostDelete(PermissionRequiredMixin, DeleteView):
+    permission_required = ('news.delete_post',)
     model = Post
     template_name = 'news_delete.html'
     success_url = reverse_lazy('all_news')
 
 
-
 # Добавляем новое представление для создания только статьи.
-class PostCreateAR(CreateView):
+class PostCreateAR(PermissionRequiredMixin, CreateView):
+    permission_required = ('news.add_post',)
     # Указываем нашу разработанную форму
     form_class = PostForm
     # модель
@@ -102,14 +106,16 @@ class PostCreateAR(CreateView):
 
 
 # # Добавляем представление для изменения статьи.
-class PostUpdateAR(UpdateView):
+class PostUpdateAR(PermissionRequiredMixin, UpdateView):
+    permission_required = ('news.change_post',)
     form_class = PostForm
     model = Post
     template_name = 'articles_edit.html'
 
 
 # # Представление удаляющее статью.
-class PostDeleteAR(DeleteView):
+class PostDeleteAR(PermissionRequiredMixin, DeleteView):
+    permission_required = ('news.delete_post',)
     model = Post
     template_name = 'articles_delete.html'
     success_url = reverse_lazy('all_news')

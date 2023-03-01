@@ -10,6 +10,10 @@ NEWS
     <h1>Все новости и статьи:</h1>
     <h8>Количество новостей и статей: {{ posts|length }}</h8>
     <hr>
+<!--       {# Теперь будем проверять не request.user.is_authenticated, а конкретные права #}-->
+    {% if perms.news.add_post %}
+    <a href="{% url 'articles_create' %}">Добавить статью</a> <a href="{% url 'news_create' %}">Добавить новость</a>
+    {% endif %}
 
     {% if posts %}
         <table>
@@ -18,6 +22,9 @@ NEWS
                 <td>Дата публикации: </td>
                 <td>Содержание: </td>
                 <td>Категория поста: </td>
+                {% if perms.news.change_post or perms.news.delete_post %}
+                <td>Действия:</td>
+                {% endif %}
             </tr>
 
             {% for post in posts|dictsortreversed:"dateCreation" %}
@@ -26,6 +33,19 @@ NEWS
                 <td>{{ post.dateCreation|date:'d M Y' }}</td>
                 <td>{{ post.text|truncatewords:20|censor:"редиска"  }}</td>
                 <td>{{ post.categoryType }}</td>
+                <td>
+                    {# Размещаем ссылки #}
+                    {% if post.categoryType == "AR" and perms.news.change_post %}
+                     <a href="{% url 'articles_create' pk=post.id %}">Изменить</a>
+                    {% elif post.categoryType == "NW" and perms.news.change_post %}
+                     <a href="{% url 'news_create' pk=post.id %}">Изменить</a>
+                    {% endif %}
+                    {% if post.categoryType == "AR" and perms.news.delete_post %}
+                     <a href="{% url 'articles_delete' post.id %}">Удалить</a>
+                    {% elif post.categoryType == "NW" and perms.news.delete_post %}
+                     <a href="{% url 'news_delete' post.id %}">Удалить</a>
+                    {% endif %}
+                </td>
             </tr>
             {% endfor %}
 
