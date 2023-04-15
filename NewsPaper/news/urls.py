@@ -2,7 +2,7 @@ from django.urls import path
 # Импортируем созданное нами представление
 from .views import (NewsList, NewsDetail, NewsListSearch, PostCreate, PostUpdate,
                     PostDelete, PostCreateAR, PostUpdateAR, PostDeleteAR)
-
+from django.views.decorators.cache import cache_page
 
 
 urlpatterns = [
@@ -12,7 +12,7 @@ urlpatterns = [
    # Т.к. наше объявленное представление является классом,
    # а Django ожидает функцию, нам надо представить этот класс в виде view.
    # Для этого вызываем метод as_view.
-   path('', NewsList.as_view(), name='all_news'),
+   path('', cache_page(60*1)(NewsList.as_view()), name='all_news'),
    # pk — это первичный ключ товара, который будет выводиться у нас в шаблон
    # int — указывает на то, что принимаются только целочисленные значения
    path('<int:pk>', NewsDetail.as_view(), name='detail_one_news'),

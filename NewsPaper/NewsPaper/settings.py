@@ -61,8 +61,15 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'
+    'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
+    'django.middleware.cache.UpdateCacheMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware',
 ]
+
+
+
+
 
 ROOT_URLCONF = 'NewsPaper.urls'
 
@@ -186,3 +193,128 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': os.path.join(BASE_DIR, 'cache_files'), # Указываем, куда будем сохранять кэшируемые файлы! Не забываем создать папку cache_files внутри папки с manage.py!
+    }
+}
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'loggers': {
+        'django': {
+            'handlers': ['console_debug', 'console_warning', 'console_err_crit', 'logfile'],
+            'propagate': True,
+        },
+        'django.request': {
+            'handlers': ['logfile_err', 'mail_admins'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'django.server': {
+            'handlers': ['logfile_err', 'mail_admins'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'django.template': {
+            'handlers': ['logfile_err'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'django.db.backends': {
+            'handlers': ['logfile_err'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'django.security': {
+            'handlers': ['logfile_security'],
+            'propagate': False,
+        },
+    },
+    'handlers': {
+        'console_debug': {
+            'level': 'DEBUG',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+            'formatter': 'myformatter_deb',
+        },
+        'console_warning': {
+            'level': 'WARNING',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+            'formatter': 'myformatter_warn',
+        },
+        'console_err_crit': {
+            'level': 'ERROR',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+            'formatter': 'myformatter_err_crit',
+        },
+        'logfile': {
+            'level': 'INFO',
+            'filters': ['require_debug_false'],
+            'class': 'logging.FileHandler',
+            'filename': 'general.log',
+            'formatter': 'myformatter_logfile',
+        },
+        'logfile_err': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'logging.FileHandler',
+            'filename': 'errors.log',
+            'formatter': 'myformatter_errfile',
+        },
+       'logfile_security': {
+            'filters': ['require_debug_false'],
+            'class': 'logging.FileHandler',
+            'filename': 'security.log',
+            'formatter': 'myformatter_security',
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler',
+            'formatter': 'myformatter_mail',
+        },
+    },
+    'formatters': {
+        'myformatter_deb': {
+            'format': '%(levelname)s %(message)s %(asctime)s',
+            'datetime': '%m.%d %H:%M:S',
+            },
+        'myformatter_warn': {
+            'format': '%(levelname)s %(message)s %(pathname) %(asctime)s',
+            'datetime': '%m.%d %H:%M:S',
+            },
+        'myformatter_err_crit': {
+            'format': '%(levelname)s %(message)s %(exc_info) %(asctime)s',
+            'datetime': '%m.%d %H:%M:S',
+            },
+        'myformatter_logfile': {
+            'format': '%(levelname)s %(message)s %(module)s %(asctime)s',
+            'datetime': '%m.%d %H:%M:S',
+            },
+        'myformatter_errfile': {
+            'format': '%(levelname)s %(message)s %(pathname) %(exc_info) %(asctime)s',
+            'datetime': '%m.%d %H:%M:S',
+            },
+        'myformatter_security': {
+            'format': '%(levelname)s %(message)s %(module)s %(asctime)s',
+            'datetime': '%m.%d %H:%M:S',
+            },
+        'myformatter_mail': {
+            'format': '%(levelname)s %(message)s %(pathname) %(asctime)s',
+            'datetime': '%m.%d %H:%M:S',
+            },
+    },
+    'filters': {
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+    },
+}

@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
+{% load cache %}
+    {% cache 30 header %}
+        {% block header %}
         <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
@@ -39,6 +42,8 @@
                </div>
            </div>
         </nav>
+        {% endblock header %}
+    {% endcache %}
 
         <!-- Page content-->
         <div class="container">

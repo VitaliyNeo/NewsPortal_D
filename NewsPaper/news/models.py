@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Sum
 from django.urls import reverse
+from django.core.cache import cache
 
 
 class Author(models.Model):
@@ -61,8 +62,14 @@ class Post(models.Model):
     def __str__(self):
         return f'{self.categoryType.title()}:{self.title.title()}:{self.dateCreation}:{self.text.title()}'
 
-    def get_absolute_url(self):
-        return reverse('detail_one_news', args=[str(self.id)])
+    # def get_absolute_url(self):
+    #     return reverse('detail_one_news', args=[str(self.id)])
+    def get_absolute_url(self):  # добавим абсолютный путь, чтобы после создания нас перебрасывало на страницу с товаром
+        return f'/posts/{self.id}'
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)  # сначала вызываем метод родителя, чтобы объект сохранился
+        cache.delete(f'post-{self.pk}')  # затем удаляем его из кэша, чтобы сбросить его
 
 
 class PostCategory(models.Model):

@@ -8,6 +8,10 @@ from .models import Post, Category, Subscriber
 from .filter import PostFilter
 from .forms import PostForm
 from django.shortcuts import get_object_or_404, render
+from django.core.cache import cache
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class NewsList(ListView):
@@ -47,12 +51,25 @@ class NewsList(ListView):
 
 
 class NewsDetail(DetailView):
-    # Модель всё та же, но мы хотим получать информацию по отдельному посту
-    model = Post
-    # Используем другой шаблон
+    # # Модель всё та же, но мы хотим получать информацию по отдельному посту
+    # model = Post
+    # # Используем другой шаблон
+    # template_name = 'detail_one_news.html'
+    # # Название объекта, в котором будет выбранный пользователем пост
+    # context_object_name = 'detail_one_news'
     template_name = 'detail_one_news.html'
-    # Название объекта, в котором будет выбранный пользователем пост
-    context_object_name = 'detail_one_news'
+    queryset = Post.objects.all()
+
+    def get_object(self, *args, **kwargs):  # переопределяем метод получения объекта, как ни странно
+        obj = cache.get(f'post-{self.kwargs["pk"]}',
+                        None)  # кэш очень похож на словарь, и метод get действует так же. Он забирает значение по ключу, если его нет, то забирает None.
+
+        # если объекта нет в кэше, то получаем его и записываем в кэш
+        if not obj:
+            obj = super().get_object(queryset=self.queryset)
+            cache.set(f'post-{self.kwargs["pk"]}', obj)
+
+        return obj
 
 
 class NewsListSearch(NewsList):
